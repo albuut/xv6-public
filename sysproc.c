@@ -13,10 +13,13 @@ sys_fork(void)
   return fork();
 }
 
+//lab1
 int
 sys_exit(void)
 {
-  exit();
+  int status;
+  argint(0,&status);
+  exit(status);
   return 0;  // not reached
 }
 
