@@ -113,3 +113,9 @@ int
 sys_getppid(void){
   return myproc()->parent->pid;
 }
+
+int
+sys_ps(void){
+  ps();
+  return 0;
+}

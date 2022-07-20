@@ -293,6 +293,7 @@ wait(int *exit_status)
         if(exit_status){
           *exit_status = p->exit_status;
         }
+
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -393,6 +394,7 @@ scheduler(void)
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
       c->proc = p;
+      p->s_count++;
       switchuvm(p);
       p->state = RUNNING;
 
@@ -584,4 +586,21 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+void
+ps(void){
+  struct proc *p;
+  char enum_val[6][10] = {"UNUSED", "EMBRYO", "SLEEPING", "RUNNABLE", "RUNNING", "ZOMBIE"};
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid != 0){
+      cprintf("PID #: %d\n",p->pid);
+      cprintf("Parent PID#: %d\n",p->parent->pid);
+      cprintf("State: %s\n", enum_val[p->state]);
+      cprintf("# Scheduled: %d\n", p->s_count);
+      cprintf("# Mem: %d\n\n", p->sz);    
+    }
+  }
+  release(&ptable.lock);
 }

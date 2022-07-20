@@ -119,6 +119,7 @@ void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(int* status);
 int             waitpid(int,int*,int);
+void            ps(void);
 void            wakeup(void*);
 void            yield(void);
 
