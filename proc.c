@@ -112,6 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  p->priority = 10; //Lab2
+  p->start_time = ticks;
   return p;
 }
 
@@ -208,6 +210,9 @@ fork(void)
       np->ofile[i] = filedup(curproc->ofile[i]);
   np->cwd = idup(curproc->cwd);
 
+  //np->priority = curproc->priority;
+  np->wait_time = 0;
+
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
@@ -249,6 +254,13 @@ exit(int status)
   iput(curproc->cwd);
   end_op();
   curproc->cwd = 0;
+
+  curproc->end_time = ticks;
+  cprintf(" Origional Priority %d\n", curproc->origional_priority);
+  cprintf(" Turn around time is %d\n", curproc->end_time - curproc->start_time);
+  cprintf(" Wait time is %d\n", curproc->wait_time);
+  
+
 
   acquire(&ptable.lock);
 
@@ -376,27 +388,48 @@ waitpid(int p_pid, int *exit_status, int val)
 void
 scheduler(void)
 {
+
   struct proc *p;
+  struct proc *temp;
+  struct proc *min_prio_p = 0;
+
   struct cpu *c = mycpu();
   c->proc = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    min_prio_p = ptable.proc;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
+      if(p->state != RUNNABLE){
         continue;
+      }
+      min_prio_p = p;
+      for(temp = ptable.proc; temp < &ptable.proc[NPROC]; temp++){
+        if(temp->state != RUNNABLE)
+          continue;
+        if(min_prio_p->priority > temp->priority){
+          if(min_prio_p->priority > 0){
+            min_prio_p->priority--;
+          }
+          min_prio_p->wait_time++;
+          min_prio_p = temp;
+        }else if(temp->state == RUNNABLE){
+          if(temp->priority > 0){
+            temp->priority--;
+          }
+          temp->wait_time++;
+        }
+      }
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
+      p = min_prio_p;
       c->proc = p;
       p->s_count++;
       switchuvm(p);
       p->state = RUNNING;
+      p->priority++;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
@@ -405,9 +438,10 @@ scheduler(void)
       // It should have changed its p->state before coming back.
       c->proc = 0;
     }
+    
     release(&ptable.lock);
-
   }
+
 }
 
 // Enter scheduler.  Must hold only ptable.lock
@@ -603,4 +637,15 @@ ps(void){
     }
   }
   release(&ptable.lock);
+}
+
+void
+setPriority(int priority){
+  struct proc *curr = myproc();
+  if(priority < 0){
+    curr->priority = 0;
+  }else{
+    curr->priority = priority;
+  }
+  curr->origional_priority = priority;
 }

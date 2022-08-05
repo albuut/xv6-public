@@ -119,3 +119,20 @@ sys_ps(void){
   ps();
   return 0;
 }
+
+void
+sys_setPriority(void){
+  int priority;
+  argint(0,&priority);
+  return setPriority(priority);
+}
+
+int 
+sys_getPriority(void){
+  return myproc()->priority;
+}
+
+void 
+sys_yield(void){
+  return yield();
+}

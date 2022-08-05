@@ -106,6 +106,9 @@ extern int sys_uptime(void);
 extern int sys_getppid(void); //lab1
 extern int sys_waitpid(void);
 extern int sys_ps(void);
+extern int sys_setPriority(void);
+extern int sys_getPriority(void);
+extern int sys_yield(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -132,6 +135,9 @@ static int (*syscalls[])(void) = {
 [SYS_getppid] sys_getppid, //lab1
 [SYS_waitpid] sys_waitpid,
 [SYS_ps]      sys_ps,
+[SYS_setPriority]  sys_setPriority, //lab2
+[SYS_getPriority]  sys_getPriority,
+[SYS_yield] sys_yield,
 };
 
 void

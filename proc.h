@@ -51,6 +51,11 @@ struct proc {
   char name[16];               // Process name (debugging)
   int exit_status;
   int s_count;
+  int priority;
+  int origional_priority;
+  int start_time;
+  int end_time;
+  int wait_time;
 };
 
 // Process memory is laid out contiguously, low addresses first:

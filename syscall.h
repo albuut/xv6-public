@@ -23,3 +23,6 @@
 #define SYS_getppid 22 //Lab1
 #define SYS_waitpid 23
 #define SYS_ps 24
+#define SYS_setPriority 25 //Lab2
+#define SYS_getPriority 26
+#define SYS_yield 27

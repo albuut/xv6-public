@@ -27,6 +27,10 @@ int uptime(void);
 int getppid(void); //lab1
 int waitppid(int,int*,int);
 void ps(void);
+void setPriority(int);
+int getPriority(void);
+int yield(void);
+
 
 // ulib.c
 int stat(const char*, struct stat*);
