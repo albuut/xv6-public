@@ -441,7 +441,6 @@ scheduler(void)
     
     release(&ptable.lock);
   }
-
 }
 
 // Enter scheduler.  Must hold only ptable.lock

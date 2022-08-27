@@ -32,7 +32,7 @@ int PScheduler(void){
 		continue;}
 	else if ( pid == 0) {
 
-		setPriority(30-10*i);	
+		setPriority(100-10*i);	
 		for (j=0;j<50000;j++) {
 			for(k=0;k<1000;k++) {
 				asm("nop"); }}
